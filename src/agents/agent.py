@@ -14,6 +14,7 @@ from storage.memory.memory_saver import get_memory_saver
 
 # 导入工具
 from tools.hot_topic_searcher import search_hot_topics, search_all_platforms_hot_topics
+from tools.script_template_reader import get_script_template
 
 LLM_CONFIG = "config/agent_llm_config.json"
 
@@ -60,7 +61,7 @@ def build_agent(ctx=None):
     )
 
     # 构建工具列表
-    tools = [search_hot_topics, search_all_platforms_hot_topics]
+    tools = [search_hot_topics, search_all_platforms_hot_topics, get_script_template]
 
     # 创建并返回 Agent
     return create_agent(
