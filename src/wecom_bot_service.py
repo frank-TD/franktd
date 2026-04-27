@@ -7,13 +7,11 @@ import asyncio
 import os
 import websockets
 from typing import Optional
-from src.agents.agent import build_agent, AgentState
-from langchain_core.messages import HumanMessage, AIMessage
 
 
 class WeComBotService:
     """企业微信机器人服务"""
-    
+
     def __init__(self, bot_id: str, secret: str):
         self.bot_id = bot_id
         self.secret = secret
@@ -21,19 +19,19 @@ class WeComBotService:
         self.websocket: Optional = None
         self.is_connected = False
         self.agent = None
-        
+
     async def connect(self):
         """建立WebSocket长连接"""
         try:
             print(f"[企微机器人] 正在连接企业微信...")
-            
+
             self.websocket = await websockets.connect(
                 self.ws_url,
                 ping_interval=30,
                 ping_timeout=10,
                 close_timeout=10
             )
-            
+
             # 发送订阅指令
             subscribe_msg = {
                 "aibot_subscribe": {
@@ -41,29 +39,34 @@ class WeComBotService:
                     "secret": self.secret
                 }
             }
-            
+
             await self.websocket.send(json.dumps(subscribe_msg))
             print("[企微机器人] ✓ 订阅指令已发送")
-            
+
             # 等待订阅结果
             response = await asyncio.wait_for(self.websocket.recv(), timeout=10)
             result = json.loads(response)
-            
+
             if result.get("errcode") == 0:
                 self.is_connected = True
                 print("[企微机器人] ✅ 连接成功！")
-                
+
                 # 初始化Agent
                 print("[企微机器人] 正在初始化Agent...")
-                self.agent = build_agent()
-                print("[企微机器人] ✅ Agent初始化完成")
-                
+                try:
+                    from agents.agent import build_agent
+                    self.agent = build_agent()
+                    print("[企微机器人] ✅ Agent初始化完成")
+                except Exception as e:
+                    print(f"[企微机器人] ⚠️ Agent初始化失败: {str(e)}")
+                    print("[企微机器人] 将使用简化模式处理消息")
+
                 return True
             else:
                 error_msg = result.get("errmsg", "未知错误")
                 print(f"[企微机器人] ❌ 订阅失败: {error_msg}")
                 return False
-                
+
         except asyncio.TimeoutError:
             print("[企微机器人] ❌ 连接超时")
             return False
@@ -91,46 +94,55 @@ class WeComBotService:
         """处理收到的消息"""
         try:
             print(f"[企微机器人] 收到消息: {message_data}")
-            
+
             # 解析消息内容
             msg_type = message_data.get("msgtype", "")
             user_id = message_data.get("userid", "")
-            
+
             if msg_type == "text":
                 content = message_data.get("text", {}).get("content", "")
                 print(f"[企微机器人] 用户消息: {content}")
-                
+
                 # 转发给Agent处理
                 if self.agent:
                     print("[企微机器人] 正在调用Agent处理...")
-                    
+
                     # 创建会话状态
                     config = {"configurable": {"thread_id": user_id or "default"}}
-                    
+
                     # 调用Agent
                     response = await self.agent.ainvoke(
-                        {"messages": [HumanMessage(content=content)]},
+                        {"messages": [content]},
                         config=config
                     )
-                    
+
                     # 获取回复
                     if response and "messages" in response:
                         last_message = response["messages"][-1]
-                        reply_content = last_message.content
-                        
+                        reply_content = getattr(last_message, 'content', str(last_message))
+
                         print(f"[企微机器人] Agent回复: {reply_content[:100]}...")
-                        
+
                         # 发送回复
                         await self.send_message(reply_content)
                     else:
                         await self.send_message("抱歉，我无法处理您的请求。")
                 else:
-                    await self.send_message("Agent未初始化，请稍后重试。")
-            
+                    # Agent未初始化的简单回复
+                    print("[企微机器人] 使用简化模式回复")
+                    if "你好" in content or "hi" in content:
+                        await self.send_message("你好！我是嗨萌马短视频创作专家，很高兴为您服务！")
+                    elif "选题" in content:
+                        await self.send_message("抱歉，Agent服务暂时不可用。请稍后重试或联系管理员。")
+                    else:
+                        await self.send_message("收到您的消息。我正在努力恢复服务，请稍后再试。")
+
         except Exception as e:
             print(f"[企微机器人] 处理消息错误: {str(e)}")
             import traceback
             traceback.print_exc()
+            # 发送错误提示
+            await self.send_message("抱歉，处理您的消息时出错了。")
     
     async def listen_messages(self):
         """持续监听消息"""
