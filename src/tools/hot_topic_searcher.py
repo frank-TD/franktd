@@ -33,12 +33,12 @@ def _search_hot_topics_impl(platform: str) -> str:
     results = []
 
     # 搜索多个关键词以获取更全面的热点信息
-    for keyword in keywords:
+    for keyword in keywords[:2]:  # 只搜索前2个关键词，减少数据量
         try:
             response = client.search(
                 query=keyword,
                 search_type="web",
-                count=10,
+                count=5,  # 减少到5条
                 time_range="1w",  # 最近 7 天
                 need_summary=True,
                 need_url=True
@@ -68,20 +68,22 @@ def _search_hot_topics_impl(platform: str) -> str:
     output.append(f"📱 {platform.upper()} 平台近 7 天热点信息")
     output.append(f"{'='*80}\n")
 
-    for i, item in enumerate(results[:15], 1):  # 最多返回 15 条热点
+    # 限制返回数量，避免数据过大
+    for i, item in enumerate(results[:5], 1):  # 改为最多返回 5 条热点
         output.append(f"【热点 {i}】")
         output.append(f"📌 标题：{item['title']}")
-        output.append(f"🔗 链接：{item['url']}")
+        # 不输出链接，减少数据量
         if item['publish_time']:
             output.append(f"⏰ 时间：{item['publish_time']}")
         if item['site_name']:
             output.append(f"📄 来源：{item['site_name']}")
+        # 截断过长的摘要
         if item['summary']:
-            output.append(f"📝 摘要：{item['summary']}")
+            summary = item['summary'][:200] + "..." if len(item['summary']) > 200 else item['summary']
+            output.append(f"📝 摘要：{summary}")
         elif item['snippet']:
-            output.append(f"📝 摘要：{item['snippet']}")
-        if item['auth_info']:
-            output.append(f"✅ 权威度：{item['auth_info']}")
+            snippet = item['snippet'][:200] + "..." if len(item['snippet']) > 200 else item['snippet']
+            output.append(f"📝 摘要：{snippet}")
         output.append("")
 
     return "\n".join(output)
@@ -117,6 +119,12 @@ def search_all_platforms_hot_topics() -> str:
             result = _search_hot_topics_impl(platform)
             all_results.append(result)
         except Exception as e:
-            all_results.append(f"搜索 {platform} 平台热点时出错：{str(e)}")
+            error_msg = f"搜索 {platform} 平台热点时出错：{str(e)}"
+            all_results.append(error_msg)
+            continue  # 即使出错也继续搜索其他平台
+
+    # 如果所有平台都失败，返回友好的错误信息
+    if all("出错" in result for result in all_results):
+        return "抱歉，当前无法获取热点信息，请稍后再试。"
 
     return "\n\n".join(all_results)
