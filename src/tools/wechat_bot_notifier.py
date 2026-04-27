@@ -7,7 +7,8 @@ import json
 import requests
 from langchain.tools import tool
 from coze_workload_identity import Client
-from coze_coding_utils.runtime_ctx.context import new_context, request_context
+from coze_coding_utils.runtime_ctx.context import new_context
+from coze_coding_utils.log.write_log import request_context
 from cozeloop.decorator import observe
 
 

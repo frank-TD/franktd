@@ -16,6 +16,7 @@ from storage.memory.memory_saver import get_memory_saver
 from tools.hot_topic_searcher import search_all_platforms_hot_topics
 from tools.hot_topic_filter import filter_hot_topics, get_filter_keywords
 from tools.wechat_bot_notifier import send_text_to_wechat, send_markdown_to_wechat, send_news_to_wechat
+from tools.wecom_long_connection import send_to_wecom_text, send_to_wecom_markdown, test_wecom_connection
 
 LLM_CONFIG = "config/agent_llm_config.json"
 
@@ -68,7 +69,10 @@ def build_agent(ctx=None):
         get_filter_keywords,
         send_text_to_wechat,
         send_markdown_to_wechat,
-        send_news_to_wechat
+        send_news_to_wechat,
+        send_to_wecom_text,
+        send_to_wecom_markdown,
+        test_wecom_connection
     ]
 
     # 创建并返回 Agent
