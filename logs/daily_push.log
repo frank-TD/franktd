@@ -1,0 +1,77 @@
+2026-04-27 15:57:41,097 [INFO] ============================================================
+2026-04-27 15:57:41,101 [INFO] 嗨萌马每日选题推送服务
+2026-04-27 15:57:41,103 [INFO] ============================================================
+2026-04-27 15:57:41,104 [INFO] 📅 推送时间：2026-04-27 15:57:41
+2026-04-27 15:57:41,106 [INFO] 🤖 机器人ID：aibylL5aVP4HUVHdyCZf...
+2026-04-27 15:57:41,107 [INFO] 
+============================================================
+2026-04-27 15:57:41,109 [INFO] 步骤1：生成选题清单
+2026-04-27 15:57:41,110 [INFO] ============================================================
+2026-04-27 15:57:41,113 [ERROR] 
+❌ 推送流程异常: No module named 'agents'
+2026-04-27 15:57:53,912 [INFO] ============================================================
+2026-04-27 15:57:53,915 [INFO] 嗨萌马每日选题推送服务
+2026-04-27 15:57:53,917 [INFO] ============================================================
+2026-04-27 15:57:53,919 [INFO] 📅 推送时间：2026-04-27 15:57:53
+2026-04-27 15:57:53,920 [INFO] 🤖 机器人ID：aibylL5aVP4HUVHdyCZf...
+2026-04-27 15:57:53,922 [INFO] 
+============================================================
+2026-04-27 15:57:53,923 [INFO] 步骤1：生成选题清单
+2026-04-27 15:57:53,924 [INFO] ============================================================
+2026-04-27 15:58:03,531 [INFO] 🔄 正在初始化Agent...
+2026-04-27 15:58:04,753 [INFO] Attempting database connection (attempt 1/2)
+2026-04-27 15:58:04,794 [INFO] Database connection established on attempt 1
+2026-04-27 15:58:04,815 [INFO] Memory schema and tables created
+2026-04-27 15:58:04,816 [WARNING] Failed to create AsyncPostgresSaver: AsyncConnectionPool open with no running loop, will fallback to MemorySaver
+2026-04-27 15:58:04,817 [WARNING] Using MemorySaver as fallback checkpointer (data will not persist across restarts)
+2026-04-27 15:58:04,829 [INFO] 🔄 正在生成选题清单...
+2026-04-27 15:58:04,833 [ERROR] ✗ 生成选题失败: Checkpointer requires one or more of the following 'configurable' keys: thread_id, checkpoint_ns, checkpoint_id
+2026-04-27 15:58:04,835 [INFO] 
+============================================================
+2026-04-27 15:58:04,840 [INFO] 步骤2：推送到企业微信
+2026-04-27 15:58:04,841 [INFO] ============================================================
+2026-04-27 15:58:05,115 [ERROR] 获取access_token异常: 获取access_token失败: invalid corpid, hint: [1777276685256363190567084], from ip: 115.190.218.237, more info at https://open.work.weixin.qq.com/devtool/query?e=40013
+2026-04-27 15:58:05,115 [ERROR] 
+❌ 推送流程异常: 获取access_token失败: invalid corpid, hint: [1777276685256363190567084], from ip: 115.190.218.237, more info at https://open.work.weixin.qq.com/devtool/query?e=40013
+2026-04-27 15:58:56,424 [INFO] ============================================================
+2026-04-27 15:58:56,427 [INFO] 嗨萌马每日选题推送服务
+2026-04-27 15:58:56,429 [INFO] ============================================================
+2026-04-27 15:58:56,431 [INFO] 📅 推送时间：2026-04-27 15:58:56
+2026-04-27 15:58:56,433 [INFO] 🤖 机器人ID：aibylL5aVP4HUVHdyCZf...
+2026-04-27 15:58:56,434 [INFO] 
+============================================================
+2026-04-27 15:58:56,435 [INFO] 步骤1：生成选题清单
+2026-04-27 15:58:56,437 [INFO] ============================================================
+2026-04-27 15:59:06,908 [INFO] 🔄 正在初始化Agent...
+2026-04-27 15:59:07,910 [INFO] Attempting database connection (attempt 1/2)
+2026-04-27 15:59:07,970 [INFO] Database connection established on attempt 1
+2026-04-27 15:59:07,992 [INFO] Memory schema and tables created
+2026-04-27 15:59:07,993 [WARNING] Failed to create AsyncPostgresSaver: AsyncConnectionPool open with no running loop, will fallback to MemorySaver
+2026-04-27 15:59:07,993 [WARNING] Using MemorySaver as fallback checkpointer (data will not persist across restarts)
+2026-04-27 15:59:08,009 [INFO] 🔄 正在生成选题清单...
+2026-04-27 15:59:10,418 [INFO] HTTP Request: POST https://integration.coze.cn/api/v3/chat/completions "HTTP/1.1 200 OK"
+2026-04-27 15:59:10,545 [WARNING] Noop client not supported. Invalid parameter. workspace_id is required.
+2026-04-27 15:59:11,716 [WARNING] Noop client not supported. Invalid parameter. workspace_id is required.
+2026-04-27 15:59:12,766 [WARNING] Noop client not supported. Invalid parameter. workspace_id is required.
+2026-04-27 15:59:13,295 [WARNING] Noop client not supported. Invalid parameter. workspace_id is required.
+2026-04-27 15:59:13,642 [WARNING] Noop client not supported. Invalid parameter. workspace_id is required.
+2026-04-27 15:59:13,990 [WARNING] Noop client not supported. Invalid parameter. workspace_id is required.
+2026-04-27 15:59:14,463 [WARNING] Noop client not supported. Invalid parameter. workspace_id is required.
+2026-04-27 15:59:15,629 [WARNING] Noop client not supported. Invalid parameter. workspace_id is required.
+2026-04-27 15:59:16,044 [WARNING] Noop client not supported. Invalid parameter. workspace_id is required.
+2026-04-27 15:59:16,614 [WARNING] Noop client not supported. Invalid parameter. workspace_id is required.
+2026-04-27 15:59:17,063 [WARNING] Noop client not supported. Invalid parameter. workspace_id is required.
+2026-04-27 15:59:17,530 [WARNING] Noop client not supported. Invalid parameter. workspace_id is required.
+2026-04-27 15:59:21,155 [INFO] HTTP Request: POST https://integration.coze.cn/api/v3/chat/completions "HTTP/1.1 200 OK"
+2026-04-27 16:00:04,839 [INFO] HTTP Request: POST https://integration.coze.cn/api/v3/chat/completions "HTTP/1.1 200 OK"
+2026-04-27 16:00:43,469 [INFO] ✓ 选题生成成功
+2026-04-27 16:00:43,471 [INFO] 
+============================================================
+2026-04-27 16:00:43,473 [INFO] 步骤2：推送到企业微信
+2026-04-27 16:00:43,474 [INFO] ============================================================
+2026-04-27 16:00:43,836 [WARNING] ⚠ Markdown消息发送失败: access_token missing, hint: [1777276843201851872921476], from ip: 115.190.93.94, more info at https://open.work.weixin.qq.com/devtool/query?e=41001
+2026-04-27 16:00:43,839 [INFO] 
+============================================================
+2026-04-27 16:00:43,841 [INFO] 推送完成
+2026-04-27 16:00:43,841 [INFO] ============================================================
+2026-04-27 16:00:43,842 [ERROR] ❌ 推送失败: access_token missing, hint: [1777276843201851872921476], from ip: 115.190.93.94, more info at https://open.work.weixin.qq.com/devtool/query?e=41001

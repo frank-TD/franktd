@@ -1,0 +1,61 @@
+name: 嗨萌马每日选题定时推送
+
+# 触发条件
+on:
+  # 每天北京时间9:00自动推送（UTC时间1:00）
+  schedule:
+    - cron: '0 1 * * *'
+
+  # 支持手动触发
+  workflow_dispatch:
+
+  # 可选：推送到main分支时触发（测试用）
+  # push:
+  #   branches:
+  #     - main
+
+jobs:
+  daily-topic-push:
+    name: 推送每日选题
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 检出代码
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      # 2. 设置Python环境
+      - name: 设置Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      # 3. 安装依赖
+      - name: 安装依赖
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 4. 创建日志目录
+      - name: 创建日志目录
+        run: mkdir -p logs
+
+      # 5. 运行定时推送脚本
+      - name: 推送选题到企业微信
+        env:
+          WECOM_BOT_ID: ${{ secrets.WECOM_BOT_ID }}
+          WECOM_BOT_SECRET: ${{ secrets.WECOM_BOT_SECRET }}
+          COZE_WORKLOAD_IDENTITY_API_KEY: ${{ secrets.COZE_WORKLOAD_IDENTITY_API_KEY }}
+          COZE_INTEGRATION_MODEL_BASE_URL: ${{ secrets.COZE_INTEGRATION_MODEL_BASE_URL }}
+        run: |
+          python scripts/daily_push.py
+
+      # 6. 上传日志（可选）
+      - name: 上传运行日志
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: push-logs-${{ github.run_number }}
+          path: logs/daily_push.log
+          retention-days: 7
