@@ -2,19 +2,34 @@
 嗨萌马Agent API服务
 提供RESTful API接口，供前端调用
 """
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
 import os
 import sys
 from datetime import datetime
+import logging
 
 # 添加项目路径
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src'))
 
 from agents.agent import build_agent
+
+# 配置日志
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    handlers=[
+        logging.StreamHandler(),
+        logging.FileHandler('logs/api.log', encoding='utf-8')
+    ]
+)
+logger = logging.getLogger(__name__)
+
+# 确保日志目录存在
+os.makedirs('logs', exist_ok=True)
 
 # 初始化FastAPI应用
 app = FastAPI(
@@ -31,6 +46,27 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# 添加请求日志中间件
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    """记录所有API请求"""
+    start_time = datetime.now()
+
+    # 记录请求信息
+    logger.info(f"📥 请求: {request.method} {request.url.path}")
+    logger.info(f"   来源: {request.client.host if request.client else 'unknown'}")
+
+    # 处理请求
+    response = await call_next(request)
+
+    # 计算处理时间
+    duration = (datetime.now() - start_time).total_seconds()
+
+    # 记录响应信息
+    logger.info(f"📤 响应: {response.status_code} ({duration:.3f}s)")
+
+    return response
 
 # 全局变量
 agent_instance = None
@@ -105,6 +141,10 @@ async def chat(request: ChatRequest):
     Returns:
         Agent的回复
     """
+    start_time = datetime.now()
+    logger.info(f"🎯 收到对话请求: {request.message[:50]}...")
+    logger.info(f"   会话ID: {request.session_id or '新建'}")
+
     try:
         # 初始化Agent
         agent = initialize_agent()
@@ -113,6 +153,7 @@ async def chat(request: ChatRequest):
         session_id = request.session_id or f"session_{datetime.now().strftime('%Y%m%d%H%M%S')}"
 
         # 调用Agent
+        logger.info(f"🔄 调用Agent...")
         response = agent.invoke(
             {"messages": [request.message]},
             config={"configurable": {"thread_id": session_id}}
@@ -121,6 +162,12 @@ async def chat(request: ChatRequest):
         # 提取回复内容
         assistant_message = response["messages"][-1].content
 
+        # 计算处理时间
+        duration = (datetime.now() - start_time).total_seconds()
+
+        logger.info(f"✅ Agent回复成功 (耗时: {duration:.3f}s)")
+        logger.info(f"   回复长度: {len(assistant_message)} 字符")
+
         return ChatResponse(
             message=assistant_message,
             timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -128,6 +175,7 @@ async def chat(request: ChatRequest):
         )
 
     except Exception as e:
+        logger.error(f"❌ 对话处理失败: {str(e)}")
         raise HTTPException(status_code=500, detail=f"处理失败: {str(e)}")
 
 
@@ -145,9 +193,50 @@ async def get_info():
         "endpoints": {
             "POST /api/chat": "与Agent对话",
             "GET /api/info": "获取API信息",
-            "GET /health": "健康检查"
+            "GET /health": "健康检查",
+            "GET /api/logs": "查看API日志"
         }
     }
+
+
+@app.get("/api/logs")
+async def get_logs(lines: int = 50):
+    """
+    查看API日志
+
+    Args:
+        lines: 返回的日志行数
+
+    Returns:
+        最近的日志内容
+    """
+    try:
+        log_file = os.path.join(os.path.dirname(__file__), 'logs', 'api.log')
+
+        if not os.path.exists(log_file):
+            return {
+                "status": "no_logs",
+                "message": "暂无日志文件"
+            }
+
+        # 读取最后N行日志
+        with open(log_file, 'r', encoding='utf-8') as f:
+            all_lines = f.readlines()
+            recent_lines = all_lines[-lines:] if len(all_lines) > lines else all_lines
+
+        return {
+            "status": "success",
+            "total_lines": len(all_lines),
+            "returned_lines": len(recent_lines),
+            "logs": [line.strip() for line in recent_lines]
+        }
+
+    except Exception as e:
+        logger.error(f"读取日志失败: {str(e)}")
+        return {
+            "status": "error",
+            "message": f"读取日志失败: {str(e)}"
+        }
 
 
 if __name__ == "__main__":
