@@ -1,5 +1,5 @@
 """
-嗨萌马短视频创作管家 - Agent 核心逻辑
+嗨萌马IP专属短视频创作专家Agent - Agent 核心逻辑
 """
 import os
 import json
@@ -13,9 +13,8 @@ from coze_coding_utils.runtime_ctx.context import default_headers
 from storage.memory.memory_saver import get_memory_saver
 
 # 导入工具
-from tools.hot_topic_searcher import search_hot_topics, search_all_platforms_hot_topics
+from tools.hot_topic_searcher import search_all_platforms_hot_topics
 from tools.hot_topic_filter import filter_hot_topics, get_filter_keywords
-from tools.script_template_reader import get_script_template
 
 LLM_CONFIG = "config/agent_llm_config.json"
 
@@ -33,7 +32,7 @@ class AgentState(MessagesState):
 
 
 def build_agent(ctx=None):
-    """构建嗨萌马短视频创作管家 Agent"""
+    """构建嗨萌马IP专属短视频创作专家Agent"""
     workspace_path = os.getenv("COZE_WORKSPACE_PATH", "/workspace/projects")
     config_path = os.path.join(workspace_path, LLM_CONFIG)
 
@@ -62,7 +61,7 @@ def build_agent(ctx=None):
     )
 
     # 构建工具列表
-    tools = [search_hot_topics, search_all_platforms_hot_topics, filter_hot_topics, get_filter_keywords, get_script_template]
+    tools = [search_all_platforms_hot_topics, filter_hot_topics, get_filter_keywords]
 
     # 创建并返回 Agent
     return create_agent(
