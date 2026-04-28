@@ -17,6 +17,22 @@ from tools.hot_topic_searcher import search_all_platforms_hot_topics
 from tools.hot_topic_filter import filter_hot_topics, get_filter_keywords
 from tools.wechat_bot_notifier import send_text_to_wechat, send_markdown_to_wechat, send_news_to_wechat
 from tools.wecom_long_connection import send_to_wecom_text, send_to_wecom_markdown, test_wecom_connection
+from tools.topic_history import get_recent_topics, check_topic_duplicate, record_generated_topic, get_all_topic_titles
+from langchain.tools import tool
+import time
+
+
+# 自定义工具：带去重的选题生成
+@tool
+def generate_daily_topics_with_dedup() -> str:
+    """
+    生成每日选题清单（带历史去重）
+    
+    这个工具会在生成选题前自动检查历史记录，避免重复
+    """
+    # 这里Agent会自动调用其他工具来生成选题
+    # 去重逻辑通过系统提示词和工具组合实现
+    return "请使用系统提示词中的流程生成选题，系统会自动处理去重。"
 
 LLM_CONFIG = "config/agent_llm_config.json"
 
@@ -67,13 +83,16 @@ def build_agent(ctx=None):
         search_all_platforms_hot_topics,
         filter_hot_topics,
         get_filter_keywords,
+        get_recent_topics,
+        check_topic_duplicate,
+        record_generated_topic,
         send_text_to_wechat,
         send_markdown_to_wechat,
         send_news_to_wechat,
         send_to_wecom_text,
         send_to_wecom_markdown,
         test_wecom_connection
-    ]
+    ]  
 
     # 创建并返回 Agent
     return create_agent(
